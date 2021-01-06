@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MyIoC;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,9 @@ namespace IoCSample
 {
 	public class CustomerBLL
 	{
+		public CustomerBLL(ICustomerDAL dal, Logger logger)
+		{ }
+
 	}
+
 }
