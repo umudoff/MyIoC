@@ -13,37 +13,20 @@ namespace ContainerSample
         static void Main(string[] args)
         {
             MyIoC.Container container =new MyIoC.Container();
-            
-            container.AddAssembly(Assembly.GetExecutingAssembly());
 
-            container.CreateInstance(typeof(MyIoC.CustomerBLL));
-            /*
-              var container = new MyIoC.Container();
-            container.AddAssembly(Assembly.GetExecutingAssembly());
-
-            container.AddType(typeof(CustomerBLL));
-            //container.AddType(typeof(Logger));
-            container.AddType(typeof(CustomerDAL), typeof(ICustomerDAL));
-
-            var customerBLL = (CustomerBLL)container.CreateInstance(typeof(CustomerBLL));
-            Console.WriteLine(customerBLL);
-            var customerBLL2 = container.CreateInstance<CustomerBLL2>();
-            Console.WriteLine(customerBLL2);
-             */
-
+            container.AddType(typeof(MyIoC.CustomerBLL));
+            container.AddType(typeof(MyIoC.Logger));
+            container.AddType(typeof(MyIoC.CustomerDAL), typeof(MyIoC.ICustomerDAL));
+            object cust =  container.CreateInstance(typeof(MyIoC.CustomerBLL));
+            //container.AddAssembly(Assembly.LoadFrom(@"C:\Users\Amrah\source\repos\TaskMyIoC\Task_MyIoC\ContainerSample\bin\Debug\MyIoC.dll"));
+            //object cust = container.CreateInstance(typeof(MyIoC.CustomerBLL));
+            //var customerBLL = container.CreateInstance<CustomerBLL>();
 
             Console.ReadLine();
         }
     }
 
    
-    public class CustomerBLL
-    {
-        [Import]
-        public ICustomerDAL CustomerDAL { get; set; }
-        [Import]
-        public Logger logger { get; set; }
-
-    }
+     
 
 }

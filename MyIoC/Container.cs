@@ -18,7 +18,6 @@ namespace MyIoC
 			var types = currAssembly.ExportedTypes;
 			foreach (var type in types)
 			{
-
 				// types that have [Import] attribute
 				if (type.GetProperties().Length >=1) {
 					foreach (var r in type.GetProperties())
@@ -35,10 +34,11 @@ namespace MyIoC
 					foreach (var ci in constructorImport)
 					{
 						var ctor = type.GetConstructors().Where(y => y.GetParameters().Length > 0).First();
+						AddType(type);
 						foreach (var par in ctor.GetParameters())
 						{
 							AddType(par.ParameterType);
-						}
+ 						}
 
 					}
                 }
@@ -49,10 +49,10 @@ namespace MyIoC
 					{
  						AddType(type);
 					}
-
 				}		 
 			}
 
+			 
 		}
 
 		public void AddType(Type type)
@@ -74,14 +74,43 @@ namespace MyIoC
 			{
 				Console.WriteLine($"Type {type.Name} is not registered. Cannot instantiate.");
 				return null;
-			} 
+			}
 
-			return null; //(Type)Activator.CreateInstance(type); 
+			object injectedObject=null;
+			var constrs = type.GetConstructors().Where(x => x.GetParameters().Length > 0);
+            if (constrs != null && type.GetCustomAttributes(typeof(ImportConstructorAttribute), true).Length >= 1)
+            {
+				var constInfo = constrs.First();
+				ParameterInfo[] ps = constInfo.GetParameters();
+				object [] paramets = new object[ps.Length];
+                 for (int i=0; i<ps.Length; i++){
+					paramets[i] = CreateInstance(ps[i].ParameterType);
+				}
+
+			    injectedObject= (object)Activator.CreateInstance(type, paramets);
+				return injectedObject;
+			}
+
+			var propsInfo= type.GetProperties().Where(p => p.GetCustomAttribute(typeof(ImportAttribute), true) != null);
+            if (propsInfo!=null)
+            {
+				injectedObject = (object)Activator.CreateInstance(type);
+				foreach (var p in propsInfo)
+                {
+                    if (registeredTypes.ContainsKey(p.PropertyType))
+                    {
+						var propInstance = CreateInstance(p.PropertyType);
+						p.SetValue(injectedObject,propInstance);
+                    }
+                 }
+            }
+
+			return injectedObject;   
 		}
 
 		public T CreateInstance<T>()
 		{
-			return default(T);
+			return (T)CreateInstance(typeof(T));
 		}
 
 

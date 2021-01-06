@@ -16,6 +16,8 @@ namespace MyIoC
 			this.CustomerDAL = dal;
 			this.logger = logger;
 		}
+
+
 	}
 
 	public class CustomerBLL2
